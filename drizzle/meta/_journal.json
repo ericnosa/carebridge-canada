@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790249107489,
+      "tag": "0000_cloudy_talisman",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790249244639,
+      "tag": "0001_governance_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790268852801,
+      "tag": "0002_loud_harpoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790268854003,
+      "tag": "0003_access_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1790271386462,
+      "tag": "0004_purple_hellfire_club",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1790271387756,
+      "tag": "0005_scheduling_guards",
+      "breakpoints": true
+    }
+  ]
+}

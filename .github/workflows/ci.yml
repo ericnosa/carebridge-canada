@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: lint / typecheck / test / audit / build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        # NOTE (adapted from Sprint 0 CI for this stack): pnpm, not npm.
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        # NOTE: package.json has no `typecheck` script; tsc runs directly.
+        run: npx tsc --noEmit
+
+      - name: Test
+        # NOTE (adapted): node-based suites (tests/*.mjs) via node --test,
+        # not vitest. Some suites transpile lib/*.ts using the typescript
+        # package from node_modules, so this step needs a successful install.
+        run: node --test tests/*.mjs
+
+      - name: Security audit (high and above)
+        # NOTE: needs registry access for pnpm audit.
+        run: pnpm audit --audit-level=high
+
+      - name: Build (Cloudflare worker)
+        # NOTE: runs scripts/run-framework.mjs build -> Cloudflare worker.
+        run: pnpm build
