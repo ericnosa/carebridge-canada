@@ -5,7 +5,7 @@ import {
   verifyAuthenticationResponse,
   type RegistrationResponseJSON,
   type AuthenticationResponseJSON,
-} from './simplewebauthn-mock';
+} from '@simplewebauthn/server';
 import { Foundation, AccessError, hashToken, type Identity, type Actor } from './foundation';
 import { base32, totp, equal, encrypt, decrypt } from './totp';
 import { type D1Database } from './d1-database';
@@ -113,7 +113,7 @@ export class MFA {
     const rpID = this.origin.includes('://') ? new URL(this.origin).hostname : 'localhost';
     const options = kind === 'register'
       ? await generateRegistrationOptions({
-          rpName: 'CareBridge Demo',
+          rpName: 'CareBridge Canada',
           rpID,
           userID: new TextEncoder().encode(a.user_id),
           userName: a.user_id,

@@ -48,6 +48,8 @@ jobs:
         # NOTE: needs registry access for pnpm audit.
         run: pnpm audit --audit-level=high
 
-      - name: Build (Cloudflare worker)
-        # NOTE: runs scripts/run-framework.mjs build -> Cloudflare worker.
+      - name: Build (Next.js)
+        # NOTE: standard Next.js build (the Studio refactor removed the
+        # Cloudflare worker pipeline); pnpm-lock.yaml is committed so
+        # --frozen-lockfile and the setup-node pnpm cache both work.
         run: pnpm build
