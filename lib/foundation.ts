@@ -1,4 +1,5 @@
 // Server-side service boundary. Never import into client components.
+import { type D1Database } from './d1-database';
 export type Identity = {subject:string;token:string};
 export type Actor = {id:string;user_id:string;organization_id:string;clinic_id:string|null;role:string;session_id:string;mfa_verified_at:number|null};
 export class AccessError extends Error { constructor(public status=403){super('ACCESS_DENIED');} }
@@ -78,7 +79,8 @@ export class Foundation {
    'privacy-console':{permission:'privacy.read',tables:['privacy_requests','consent_records','processing_authorities','audit_events']},
    'security-console':{permission:'security.read',tables:['security_events','sessions','incidents','audit_events']},
    'governance/readiness':{permission:'readiness.read',tables:['governance_evidence','policy_registry','risk_register']},
-   'connector-governance':{permission:'connector.read',tables:['connector_registry','vendor_registry']}
+   'connector-governance':{permission:'connector.read',tables:['connector_registry','vendor_registry']},
+   'activity-logs':{permission:'security.read',tables:['audit_events','security_events','sessions','incidents']}
   };
   const a=await this.actor(identity);const def=definitions[section];if(!def)return this.denied(a,'READ','unimplemented-console');
   await this.permit(a,def.permission);
@@ -86,5 +88,19 @@ export class Foundation {
   const counts:Record<string,number>={};
   for(const table of def.tables){const r=await this.db.prepare(`SELECT count(*) AS count FROM ${table} WHERE organization_id=?`).bind(a.organization_id).first<{count:number}>();counts[table]=r?.count??0;}
   await this.auditStatement(a,'READ','success',section).run();return counts;
+ }
+ async getActivityLogs(identity:Identity|null){
+  const a=await this.actor(identity);
+  await this.permit(a,'security.read');
+  if(a.clinic_id!==null)return this.denied(a,'READ','organization-console');
+  const audits=await this.db.prepare('SELECT id,created_at,actor,role,patient_id,resource,action,purpose,authorization_result,result,correlation_id,session_context FROM audit_events WHERE organization_id=? ORDER BY created_at DESC LIMIT 100').bind(a.organization_id).all<{id:string;created_at:number;actor:string;role:string;patient_id:string|null;resource:string;action:string;purpose:string;authorization_result:string;result:string;correlation_id:string;session_context:string|null}>();
+  const security=await this.db.prepare('SELECT id,created_at,category,severity,correlation_id,status FROM security_events WHERE organization_id=? ORDER BY created_at DESC LIMIT 50').bind(a.organization_id).all<{id:string;created_at:number;category:string;severity:string;correlation_id:string;status:string}>();
+  await this.auditStatement(a,'READ','success','activity-logs').run();
+  return {
+   audits:audits.results,
+   security:security.results,
+   organizationId:a.organization_id,
+   queriedAt:this.now()
+  };
  }
 }

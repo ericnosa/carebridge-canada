@@ -20,5 +20,6 @@ export const registries:Record<string,{title:string;tables:readonly string[]}>={
  'clinical-governance':{title:'Clinical governance',tables:['clinical_content_registry','clinical_pathways','provider_credentials']},
  'connector-governance':{title:'Connector governance',tables:['connector_registry','vendor_registry']},
  'ai-governance':{title:'AI governance',tables:['ai_model_registry','ai_prompt_registry']},
- 'governance/readiness':{title:'Governance readiness',tables:['governance_evidence','policy_registry','risk_register']}
+ 'governance/readiness':{title:'Governance readiness',tables:['governance_evidence','policy_registry','risk_register']},
+ 'activity-logs':{title:'Activity logs',tables:['audit_events','security_events','sessions','incidents']}
 };
